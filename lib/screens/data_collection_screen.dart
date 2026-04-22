@@ -14,6 +14,13 @@ class DataCollectionScreen extends StatefulWidget {
 class _DataCollectionScreenState extends State<DataCollectionScreen> {
   double _progress = 0.0;
   bool _isFinished = false;
+  
+  String _tempEsq = '--';
+  String _tempDir = '--';
+  String _bpm = '--';
+  String _spo2 = '--';
+  String _assimetria = '--';
+  double _assimetriaValue = 0.0;
 
   @override
   void initState() {
@@ -30,19 +37,35 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
 
     while (!dataReceived && mounted) {
       final sensorData = await ApiService.pollSensorData();
-      if (sensorData != null && sensorData['valida'] == true) {
-        payload = {
-          'temp_mama_esq': sensorData['esq'],
-          'temp_mama_dir': sensorData['dir'],
-          'bpm': 75, // Placeholder - Arduino não manda BPM/SpO2 ainda
-          'spo2': 98, // Placeholder
-          'nivel_atividade': 'Baixo'
-        };
-        dataReceived = true;
+      if (sensorData != null) {
         setState(() {
-          _progress = 1.0;
-          _isFinished = true;
+          if (sensorData['esq'] != null) _tempEsq = sensorData['esq'].toString();
+          if (sensorData['dir'] != null) _tempDir = sensorData['dir'].toString();
+          
+          if (sensorData['esq'] != null && sensorData['dir'] != null) {
+            double esq = (sensorData['esq'] is int) ? (sensorData['esq'] as int).toDouble() : sensorData['esq'];
+            double dir = (sensorData['dir'] is int) ? (sensorData['dir'] as int).toDouble() : sensorData['dir'];
+            _assimetriaValue = (esq - dir).abs();
+            _assimetria = _assimetriaValue.toStringAsFixed(1);
+          }
         });
+        
+        if (sensorData['valida'] == true) {
+          // Agora o backend pega os dados do sensor, passamos apenas valores padrão opcionais ou payload vazio
+          payload = {};
+          dataReceived = true;
+          setState(() {
+            _progress = 1.0;
+            _isFinished = true;
+          });
+        } else {
+          // Incrementa um progresso animado
+          setState(() {
+             _progress += 0.05;
+             if (_progress > 0.85) _progress = 0.1;
+          });
+          await Future.delayed(const Duration(seconds: 1));
+        }
       } else {
         // Incrementa um progresso "falso" animado até o sensor enviar
         setState(() {
@@ -56,7 +79,8 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
     if (!mounted) return;
 
     final createdData = await ApiService.addTriagem(payload);
-    final dataPassed = createdData ?? payload;
+    // Se não retornou dados (ex: erro), usa o próprio payload do sensorData (somente visual)
+    final dataPassed = createdData ?? {'classificacao_risco': 'Erro'};
     
     await Future.delayed(const Duration(milliseconds: 500));
     if (!mounted) return;
@@ -133,17 +157,17 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
             const SizedBox(height: 32),
             Row(
               children: [
-                Expanded(child: _buildValueCard(context, 'Temp. Mama Esq.', '36.8°C', 'normal', Icons.thermostat, Colors.amber)),
+                Expanded(child: _buildValueCard(context, 'Temp. Mama Esq.', _tempEsq == '--' ? '--' : '$_tempEsq°C', 'normal', Icons.thermostat, Colors.amber)),
                 const SizedBox(width: 16),
-                Expanded(child: _buildValueCard(context, 'Temp. Mama Dir.', '37.4°C', '+0.6°C', Icons.thermostat, Colors.amber, isWarn: true)),
+                Expanded(child: _buildValueCard(context, 'Temp. Mama Dir.', _tempDir == '--' ? '--' : '$_tempDir°C', _assimetria == '--' ? '' : '+$_assimetria°C', Icons.thermostat, Colors.amber, isWarn: _assimetriaValue >= 1.0)),
               ],
             ),
             const SizedBox(height: 16),
             Row(
               children: [
-                Expanded(child: _buildValueCard(context, 'Freq. Cardíaca', '78 bpm', 'normal', Icons.favorite, Colors.red)),
+                Expanded(child: _buildValueCard(context, 'Freq. Cardíaca', _bpm == '--' ? '--' : '$_bpm bpm', 'normal', Icons.favorite, Colors.red)),
                 const SizedBox(width: 16),
-                Expanded(child: _buildValueCard(context, 'SpO2', '97%', 'normal', Icons.water_drop, Colors.blue)),
+                Expanded(child: _buildValueCard(context, 'SpO2', _spo2 == '--' ? '--' : '$_spo2%', 'normal', Icons.water_drop, Colors.blue)),
               ],
             ),
             const SizedBox(height: 24),
@@ -208,15 +232,15 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
             children: [
               Expanded(
                 child: LinearProgressIndicator(
-                  value: 0.6 / 2.0, // Exemplo
+                  value: _assimetriaValue / 2.0, // Exemplo
                   backgroundColor: Colors.grey[200],
-                  color: Colors.amber,
+                  color: _assimetriaValue >= 2.0 ? Colors.red : (_assimetriaValue >= 1.0 ? Colors.amber : Colors.green),
                   minHeight: 10,
                   borderRadius: BorderRadius.circular(5),
                 ),
               ),
               const SizedBox(width: 16),
-              const Text('0.6°C', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.amber)),
+              Text(_assimetria == '--' ? '--' : '$_assimetria°C', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: _assimetriaValue >= 2.0 ? Colors.red : (_assimetriaValue >= 1.0 ? Colors.amber : Colors.green))),
             ],
           ),
           const SizedBox(height: 8),

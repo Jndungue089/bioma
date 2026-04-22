@@ -185,26 +185,35 @@ def clear_sensor_data():
     return jsonify({"status": "cleared"}), 200
 
 @app.route('/api/triagens', methods=['POST'])
-
 def add_triagem():
+    global sensor_data_atual
     dados = request.get_json()
     
-    # Processamento automático e classificação de risco
-    temp_esq = float(dados['temp_mama_esq'])
-    temp_dir = float(dados['temp_mama_dir'])
+    if sensor_data_atual and sensor_data_atual.get('valida'):
+        temp_esq = float(sensor_data_atual.get('esq', 0.0))
+        temp_dir = float(sensor_data_atual.get('dir', 0.0))
+    else:
+        # Fallback to payload or 0 if no sensor data
+        temp_esq = float(dados.get('temp_mama_esq', 0.0))
+        temp_dir = float(dados.get('temp_mama_dir', 0.0))
+        
     risco = calcular_risco(temp_esq, temp_dir)
     
     nova_triagem = Triagem(
         paciente_id=dados['paciente_id'],
         temp_mama_esq=temp_esq,
         temp_mama_dir=temp_dir,
-        bpm=dados.get('bpm', 0),
-        spo2=dados.get('spo2', 0),
-        nivel_atividade=dados.get('nivel_atividade', 'Desconhecido'),
+        bpm=dados.get('bpm', 75),  # Default placeholder
+        spo2=dados.get('spo2', 98), # Default placeholder
+        nivel_atividade=dados.get('nivel_atividade', 'Baixo'),
         classificacao_risco=risco
     )
     db.session.add(nova_triagem)
     db.session.commit()
+    
+    # Opcional: limpar o sensor apos realizar a triagem
+    # sensor_data_atual = None
+    
     return jsonify(nova_triagem.to_dict()), 201
 
 @app.route('/api/pacientes/<int:paciente_id>/triagens', methods=['GET'])
