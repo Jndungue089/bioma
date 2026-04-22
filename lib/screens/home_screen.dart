@@ -106,7 +106,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 Expanded(
                   child: _buildIndicator(
                     'Batimentos',
-                    '72 bpm',
+                    _lastTriagem != null && _lastTriagem!['bpm'] != null && _lastTriagem!['bpm'] > 0
+                        ? '${_lastTriagem!['bpm']} bpm'
+                        : 'Sem dados',
                     Icons.favorite,
                     Colors.redAccent,
                   ),
@@ -115,7 +117,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 Expanded(
                   child: _buildIndicator(
                     'SpO2',
-                    '98%',
+                    _lastTriagem != null && _lastTriagem!['spo2'] != null && _lastTriagem!['spo2'] > 0
+                        ? '${_lastTriagem!['spo2']}%'
+                        : 'Sem dados',
                     Icons.air,
                     Colors.blueAccent,
                   ),

@@ -10,7 +10,8 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  String _userName = 'Maria Fernandes';
+  String _userName = 'A Carregar...';
+  String _ageLocation = '';
 
   @override
   void initState() {
@@ -19,7 +20,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _loadUser() async {
-    // using api mock name here via shared_prefs in real life
+    final paciente = await ApiService.getPaciente();
+    if (mounted && paciente != null) {
+      setState(() {
+        _userName = paciente['nome'] ?? 'Sem nome';
+        final idade = paciente['idade'] != null ? '${paciente['idade']} anos' : '';
+        final localizacao = paciente['localizacao'] ?? '';
+        
+        if (idade.isNotEmpty && localizacao.isNotEmpty) {
+          _ageLocation = '$idade • $localizacao';
+        } else if (idade.isNotEmpty) {
+          _ageLocation = idade;
+        } else {
+          _ageLocation = localizacao;
+        }
+      });
+    }
   }
 
   @override
@@ -40,15 +56,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Icon(Icons.person, size: 60, color: Colors.white),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Maria Fernandes',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            Text(
+              _userName,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
-            const Text(
-              '34 anos • Luanda, Angola',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
+            if (_ageLocation.isNotEmpty)
+              Text(
+                _ageLocation,
+                style: const TextStyle(fontSize: 16, color: Colors.grey),
+              ),
             const SizedBox(height: 32),
             _buildProfileOption(
               icon: Icons.personal_injury,
