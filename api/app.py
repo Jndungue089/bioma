@@ -1,7 +1,13 @@
+
 import os
+import threading
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+
+# Variaveis globais de estado do sensor
+sensor_data_atual = None
+
 
 app = Flask(__name__)
 # Configuração do banco de dados SQLite
@@ -155,6 +161,28 @@ def update_paciente(id):
     
     db.session.commit()
     return jsonify(paciente.to_dict()), 200
+
+
+@app.route('/api/sensor/current', methods=['POST'])
+def set_sensor_data():
+    global sensor_data_atual
+    dados = request.get_json()
+    sensor_data_atual = dados
+    # print(f"Dados do sensor recebidos do arduino_bio {dados}")
+    return jsonify({"status": "ok"}), 200
+
+@app.route('/api/sensor/current', methods=['GET'])
+def get_sensor_data():
+    global sensor_data_atual
+    if sensor_data_atual is None:
+        return jsonify({"error": "Nenhum dado recebido do hardware"}), 404
+    return jsonify(sensor_data_atual), 200
+
+@app.route('/api/sensor/clear', methods=['POST'])
+def clear_sensor_data():
+    global sensor_data_atual
+    sensor_data_atual = None
+    return jsonify({"status": "cleared"}), 200
 
 @app.route('/api/triagens', methods=['POST'])
 

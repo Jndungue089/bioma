@@ -22,33 +22,38 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
   }
 
   void _startCollection() async {
-    for (int i = 0; i <= 100; i += 2) {
-      await Future.delayed(const Duration(milliseconds: 50));
-      if (!mounted) return;
-      setState(() {
-        _progress = i / 100;
-      });
+    // Clear any stale sensor data
+    await ApiService.clearSensor();
+
+    bool dataReceived = false;
+    Map<String, dynamic> payload = {};
+
+    while (!dataReceived && mounted) {
+      final sensorData = await ApiService.pollSensorData();
+      if (sensorData != null && sensorData['valida'] == true) {
+        payload = {
+          'temp_mama_esq': sensorData['esq'],
+          'temp_mama_dir': sensorData['dir'],
+          'bpm': 75, // Placeholder - Arduino não manda BPM/SpO2 ainda
+          'spo2': 98, // Placeholder
+          'nivel_atividade': 'Baixo'
+        };
+        dataReceived = true;
+        setState(() {
+          _progress = 1.0;
+          _isFinished = true;
+        });
+      } else {
+        // Incrementa um progresso "falso" animado até o sensor enviar
+        setState(() {
+           _progress += 0.05;
+           if (_progress > 0.85) _progress = 0.1; // Loop de loading
+        });
+        await Future.delayed(const Duration(seconds: 1));
+      }
     }
-    setState(() {
-      _isFinished = true;
-    });
-    
-    // Gerar dados mock para simular a triagem 
-    // Em caso real, viriam do bluetooth/sensores
-    final rnd = Random();
-    final baseTemp = 36.0 + rnd.nextDouble(); 
-    // force uma diferença aleatória
-    final varies = rnd.nextInt(3);
-    double diff = varies == 0 ? 0.2 : (varies == 1 ? 1.2 : 2.5);
-    final isLeftHotter = rnd.nextBool();
-    
-    final payload = {
-      'temp_mama_esq': double.parse((isLeftHotter ? baseTemp + diff : baseTemp).toStringAsFixed(1)),
-      'temp_mama_dir': double.parse((!isLeftHotter ? baseTemp + diff : baseTemp).toStringAsFixed(1)),
-      'bpm': 70 + rnd.nextInt(20),
-      'spo2': 95 + rnd.nextInt(5),
-      'nivel_atividade': 'Baixo'
-    };
+
+    if (!mounted) return;
 
     final createdData = await ApiService.addTriagem(payload);
     final dataPassed = createdData ?? payload;

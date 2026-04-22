@@ -118,7 +118,31 @@ class ApiService {
     }
   }
 
+  
+  static Future<Map<String, dynamic>?> pollSensorData() async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/sensor/current'));
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  static Future<void> clearSensor() async {
+    try {
+      await http.post(
+        Uri.parse('$baseUrl/sensor/clear'),
+        headers: {'Content-Type': 'application/json'},
+      );
+    } catch (e) {
+    }
+  }
+
   static Future<Map<String, dynamic>?> addTriagem(Map<String, dynamic> dados) async {
+
     try {
       final prefs = await SharedPreferences.getInstance();
       final pId = prefs.getString('paciente_id');
