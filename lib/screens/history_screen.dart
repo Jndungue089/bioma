@@ -48,18 +48,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         centerTitle: true,
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
-        actions: const [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              children: [
-                 Icon(Icons.signal_cellular_alt, color: Colors.orange),
-                 SizedBox(width: 4),
-                 Icon(Icons.battery_full, color: Colors.lightGreenAccent),
-              ],
-            )
-          ),
-        ],
+
         automaticallyImplyLeading: false,
       ),
       body: isLoading

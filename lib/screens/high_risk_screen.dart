@@ -21,18 +21,7 @@ class HighRiskScreen extends StatelessWidget {
         foregroundColor: Colors.white,
         elevation: 0,
         automaticallyImplyLeading: false,
-        actions: const [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              children: [
-                 Icon(Icons.signal_cellular_alt, color: Colors.orange),
-                 SizedBox(width: 4),
-                 Icon(Icons.battery_full, color: Colors.lightGreenAccent),
-              ],
-            )
-          ),
-        ],
+
       ),
       body: Column(
         children: [
@@ -146,19 +135,7 @@ class HighRiskScreen extends StatelessWidget {
                   const SizedBox(height: 24),
                   Row(
                     children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () {},
-                          icon: const Icon(Icons.phone_android, color: Colors.black87, size: 18),
-                          label: const Text('Partilhar', style: TextStyle(color: Colors.black87)),
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            side: const BorderSide(color: Colors.black87),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
+                      
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {

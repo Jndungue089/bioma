@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import 'login_screen.dart';
+import 'clinical_data_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -68,30 +69,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             const SizedBox(height: 32),
             _buildProfileOption(
-              icon: Icons.personal_injury,
+              icon: Icons.medical_information,
               title: 'Dados Clínicos Básicos',
-              onTap: () {},
-            ),
-            _buildProfileOption(
-              icon: Icons.settings,
-              title: 'Configurações',
-              onTap: () {},
-            ),
-            _buildProfileOption(
-              icon: Icons.help_outline,
-              title: 'Ajuda e Suporte',
-              onTap: () {},
-            ),
-            _buildProfileOption(
-              icon: Icons.medical_services_outlined,
-              title: 'Hospitais Próximos',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ClinicalDataScreen(),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () async {
-                
-                
                 await ApiService.logout();
                 if (mounted) {
                   Navigator.pushAndRemoveUntil(

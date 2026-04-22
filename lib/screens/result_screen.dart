@@ -108,20 +108,7 @@ class _ResultScreenState extends State<ResultScreen> {
               const SizedBox(height: 24),
               Row(
                 children: [
-                  Expanded(
-                    flex: 1,
-                    child: OutlinedButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.share, color: Colors.deepOrange, size: 18),
-                      label: const Text('Partilhar', style: TextStyle(color: Colors.black87)),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        side: BorderSide(color: Colors.grey[300]!),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
+                  
                   Expanded(
                     flex: 1,
                     child: ElevatedButton(
@@ -181,18 +168,7 @@ class _ResultScreenState extends State<ResultScreen> {
         backgroundColor: isVeryHighRisk ? statusColor : const Color(0xFFC75B8B),
         foregroundColor: Colors.white,
         elevation: 0,
-        actions: const [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              children: [
-                 Icon(Icons.signal_cellular_alt, color: Colors.orange),
-                 SizedBox(width: 4),
-                 Icon(Icons.battery_full, color: Colors.lightGreenAccent),
-              ],
-            )
-          ),
-        ],
+
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
@@ -340,21 +316,7 @@ class _ResultScreenState extends State<ResultScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Row(
                 children: [
-                  Expanded(
-                    flex: isHighRisk ? 1 : 1,
-                    child: OutlinedButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.cake, color: Colors.deepOrange, size: 18), // matching icon visually
-                      label: Text(isHighRisk ? 'Partilhar com familiar' : 'Partilhar', style: const TextStyle(color: Colors.black87, fontStyle: FontStyle.italic, fontWeight: FontWeight.w600)),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        side: BorderSide(color: Colors.grey[300]!),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                    ),
-                  ),
-                  if (!isHighRisk) ...[
-                    const SizedBox(width: 16),
+                    if (!isHighRisk) ...[
                     Expanded(
                       flex: 1,
                       child: ElevatedButton.icon(
