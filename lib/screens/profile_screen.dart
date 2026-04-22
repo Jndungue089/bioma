@@ -1,0 +1,118 @@
+import 'package:flutter/material.dart';
+import '../services/api_service.dart';
+import 'login_screen.dart';
+
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String _userName = 'Maria Fernandes';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUser();
+  }
+
+  void _loadUser() async {
+    // using api mock name here via shared_prefs in real life
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Meu Perfil'),
+        centerTitle: true,
+        elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            const CircleAvatar(
+              radius: 50,
+              backgroundColor: Colors.teal,
+              child: Icon(Icons.person, size: 60, color: Colors.white),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Maria Fernandes',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              '34 anos • Luanda, Angola',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+            const SizedBox(height: 32),
+            _buildProfileOption(
+              icon: Icons.personal_injury,
+              title: 'Dados Clínicos Básicos',
+              onTap: () {},
+            ),
+            _buildProfileOption(
+              icon: Icons.settings,
+              title: 'Configurações',
+              onTap: () {},
+            ),
+            _buildProfileOption(
+              icon: Icons.help_outline,
+              title: 'Ajuda e Suporte',
+              onTap: () {},
+            ),
+            _buildProfileOption(
+              icon: Icons.medical_services_outlined,
+              title: 'Hospitais Próximos',
+              onTap: () {},
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () async {
+                
+                
+                await ApiService.logout();
+                if (mounted) {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                    (route) => false,
+                  );
+                }
+              },
+              icon: const Icon(Icons.logout, color: Colors.white),
+              label: const Text('Sair do Aplicativo', style: TextStyle(color: Colors.white)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                minimumSize: const Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileOption({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.only(bottom: 12.0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        leading: Icon(icon, color: Colors.teal),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+        onTap: onTap,
+      ),
+    );
+  }
+}

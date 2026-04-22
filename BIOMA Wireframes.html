@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"/>
+<title>BIOMA – Wireframes</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Caveat+Brush&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="design-canvas.jsx"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Caveat', cursive; }
+</style>
+</head>
+<body>
+<script type="text/babel">
+
+// ─── Wireframe Primitives ───────────────────────────────────
+
+const PINK = '#e8a0b8';
+const PINK_LIGHT = '#faeef3';
+const PINK_MID = '#d4729a';
+const INK = '#1a1a1a';
+const GRAY = '#888';
+const GRAY_LIGHT = '#e8e6e3';
+const GRAY_MID = '#ccc';
+const GREEN = '#6dbf8a';
+const YELLOW = '#f0c050';
+const RED = '#e06060';
+
+// Sketchy box
+const Box = ({ w, h, style, children, fill = '#fff', border = INK }) => (
+  <div style={{
+    width: w, height: h, background: fill,
+    border: `2px solid ${border}`,
+    borderRadius: '3px 5px 4px 3px',
+    position: 'relative',
+    ...style
+  }}>{children}</div>
+);
+
+// Placeholder image block
+const ImgPlaceholder = ({ w, h, label, style }) => (
+  <div style={{
+    width: w, height: h, background: GRAY_LIGHT,
+    border: `2px dashed ${GRAY_MID}`,
+    display: 'flex', flexDirection: 'column',
+    alignItems: 'center', justifyContent: 'center',
+    color: GRAY, fontSize: 13, ...style
+  }}>
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" style={{marginBottom:4}}>
+      <rect x="2" y="6" width="24" height="18" rx="2" stroke={GRAY} strokeWidth="1.5"/>
+      <circle cx="10" cy="12" r="2.5" stroke={GRAY} strokeWidth="1.5"/>
+      <path d="M2 20l7-6 5 4 4-3 8 7" stroke={GRAY} strokeWidth="1.5" fill="none"/>
+    </svg>
+    {label}
+  </div>
+);
+
+// Pill / tag
+const Pill = ({ label, color = PINK, textColor = '#fff', style }) => (
+  <span style={{
+    background: color, color: textColor,
+    padding: '2px 10px', borderRadius: 20,
+    fontSize: 13, fontWeight: 600,
+    display: 'inline-block', ...style
+  }}>{label}</span>
+);
+
+// Sketchy button
+const Btn = ({ label, fill = INK, textColor = '#fff', w, style }) => (
+  <div style={{
+    width: w || '100%', background: fill, color: textColor,
+    border: `2px solid ${INK}`,
+    borderRadius: '6px 7px 5px 6px',
+    padding: '10px 0', textAlign: 'center',
+    fontSize: 16, fontWeight: 600,
+    cursor: 'pointer', ...style
+  }}>{label}</div>
+);
+
+// Sketchy input
+const Input = ({ label, value, style }) => (
+  <div style={{ width: '100%', ...style }}>
+    <div style={{ fontSize: 12, color: GRAY, marginBottom: 2 }}>{label}</div>
+    <div style={{
+      border: `2px solid ${INK}`,
+      borderRadius: '4px 5px 4px 3px',
+      padding: '8px 12px', fontSize: 15,
+      color: value ? INK : GRAY_MID,
+      background: '#fafafa'
+    }}>{value || '—'}</div>
+  </div>
+);
+
+// Status bar
+const StatusBar = () => (
+  <div style={{ background: PINK_MID, height: 36, display: 'flex', alignItems: 'center',
+    justifyContent: 'space-between', padding: '0 16px', color: '#fff', fontSize: 13, fontWeight: 600 }}>
+    <span>9:41</span>
+    <span>BIOMA</span>
+    <span>📶 🔋</span>
+  </div>
+);
+
+// Bottom nav
+const BottomNav = ({ active = 0 }) => {
+  const items = ['Início','Triagem','Histórico','Perfil'];
+  const icons = ['🏠','🔬','📋','👤'];
+  return (
+    <div style={{ height: 56, borderTop: `2px solid ${GRAY_MID}`, display: 'flex',
+      background: '#fff', position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+      {items.map((item, i) => (
+        <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          color: i === active ? PINK_MID : GRAY, fontSize: 12, gap: 2 }}>
+          <span style={{ fontSize: 18 }}>{icons[i]}</span>
+          <span>{item}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// Section header inside a screen
+const ScreenTitle = ({ label, sub, style }) => (
+  <div style={{ padding: '12px 16px 6px', ...style }}>
+    <div style={{ fontSize: 22, fontWeight: 700, color: INK }}>{label}</div>
+    {sub && <div style={{ fontSize: 14, color: GRAY }}>{sub}</div>}
+  </div>
+);
+
+// Risk gauge (half-circle SVG)
+const RiskGauge = ({ level = 'normal', size = 120 }) => {
+  const color = level === 'normal' ? GREEN : level === 'atencao' ? YELLOW : RED;
+  const label = level === 'normal' ? 'Normal' : level === 'atencao' ? 'Atenção' : 'Alto Risco';
+  const angle = level === 'normal' ? 30 : level === 'atencao' ? 105 : 165;
+  const r = 46, cx = 60, cy = 60;
+  const toRad = (a) => (a - 180) * Math.PI / 180;
+  const px = cx + r * Math.cos(toRad(angle));
+  const py = cy + r * Math.sin(toRad(angle));
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <svg width={size} height={size * 0.6} viewBox="0 0 120 72">
+        {/* track */}
+        <path d={`M14,60 A46,46 0 0,1 106,60`} fill="none" stroke={GRAY_LIGHT} strokeWidth="10" strokeLinecap="round"/>
+        {/* green zone */}
+        <path d={`M14,60 A46,46 0 0,1 47,18`} fill="none" stroke={GREEN} strokeWidth="10" strokeLinecap="round" opacity="0.9"/>
+        {/* yellow zone */}
+        <path d={`M47,18 A46,46 0 0,1 82,18`} fill="none" stroke={YELLOW} strokeWidth="10" strokeLinecap="round" opacity="0.9"/>
+        {/* red zone */}
+        <path d={`M82,18 A46,46 0 0,1 106,60`} fill="none" stroke={RED} strokeWidth="10" strokeLinecap="round" opacity="0.9"/>
+        {/* needle */}
+        <line x1={cx} y1={cy} x2={px} y2={py} stroke={INK} strokeWidth="3" strokeLinecap="round"/>
+        <circle cx={cx} cy={cy} r="5" fill={INK}/>
+      </svg>
+      <div style={{ fontSize: 18, fontWeight: 700, color, marginTop: -4 }}>{label}</div>
+    </div>
+  );
+};
+
+// Divider
+const Divider = () => <div style={{ height: 1, background: GRAY_LIGHT, margin: '8px 0' }}/>;
+
+// Card block
+const Card = ({ children, style }) => (
+  <div style={{
+    background: '#fff', border: `1.5px solid ${GRAY_MID}`,
+    borderRadius: '6px 8px 7px 6px', padding: '12px 14px',
+    ...style
+  }}>{children}</div>
+);
+
+// ─── SCREEN COMPONENTS ─────────────────────────────────────
+
+// 1A – Dashboard: card-based summary
+function Dashboard_A() {
+  return (
+    <div style={{ width: 390, height: 780, background: PINK_LIGHT, fontFamily: 'Caveat, cursive', position: 'relative', overflow: 'hidden' }}>
+      <StatusBar/>
+      <div style={{ padding: '0 16px', overflowY: 'auto', height: 'calc(100% - 92px)' }}>
+        {/* Greeting */}
+        <div style={{ padding: '16px 0 8px' }}>
+          <div style={{ fontSize: 14, color: GRAY }}>Olá,</div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: INK }}>Maria Fernandes 👋</div>
+        </div>
+
+        {/* Last triagem card */}
+        <Card style={{ background: '#fff', marginBottom: 12 }}>
+          <div style={{ fontSize: 13, color: GRAY, marginBottom: 4 }}>Última triagem</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 600 }}>18 Abr 2026</div>
+              <div style={{ fontSize: 13, color: GRAY }}>14:32 · Centro de Saúde Rangel</div>
+            </div>
+            <Pill label="Normal" color={GREEN} />
+          </div>
+        </Card>
+
+        {/* Quick stats */}
+        <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
+          <Card style={{ flex: 1, textAlign: 'center' }}>
+            <div style={{ fontSize: 28, fontWeight: 700, color: PINK_MID }}>4</div>
+            <div style={{ fontSize: 13, color: GRAY }}>Triagens</div>
+          </Card>
+          <Card style={{ flex: 1, textAlign: 'center' }}>
+            <div style={{ fontSize: 28, fontWeight: 700, color: GREEN }}>3</div>
+            <div style={{ fontSize: 13, color: GRAY }}>Normais</div>
+          </Card>
+          <Card style={{ flex: 1, textAlign: 'center' }}>
+            <div style={{ fontSize: 28, fontWeight: 700, color: YELLOW }}>1</div>
+            <div style={{ fontSize: 13, color: GRAY }}>Atenção</div>
+          </Card>
+        </div>
+
+        {/* CTA */}
+        <Btn label="+ Nova Triagem" fill={PINK_MID} style={{ marginBottom: 14 }}/>
+
+        {/* Reminder */}
+        <Card style={{ background: '#fffbea', border: `1.5px solid ${YELLOW}`, marginBottom: 12 }}>
+          <div style={{ fontSize: 14, fontWeight: 600 }}>⏰ Lembrete</div>
+          <div style={{ fontSize: 13, color: GRAY }}>Próxima triagem recomendada em 30 dias</div>
+        </Card>
+
+        {/* Info tip */}
+        <Card style={{ background: PINK_LIGHT, border: `1.5px solid ${PINK}` }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: PINK_MID }}>💡 Sabia que…</div>
+          <div style={{ fontSize: 13, color: INK }}>A detecção precoce aumenta as hipóteses de cura em 90%.</div>
+        </Card>
+      </div>
+      <BottomNav active={0}/>
+    </div>
+  );
+}
+
+// 1B – Dashboard: list-based timeline
+function Dashboard_B() {
+  return (
+    <div style={{ width: 390, height: 780, background: '#fafafa', fontFamily: 'Caveat, cursive', position: 'relative', overflow: 'hidden' }}>
+      <StatusBar/>
+      {/* Header band */}
+      <div style={{ background: PINK_MID, padding: '14px 16px 20px' }}>
+        <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.8)' }}>Bem-vinda,</div>
+        <div style={{ fontSize: 24, fontWeight: 700, color: '#fff' }}>Maria Fernandes</div>
+        <div style={{ marginTop: 10, display: 'flex', gap: 8 }}>
+          <div style={{ background: 'rgba(255,255,255,0.2)', borderRadius: 8, padding: '6px 14px', textAlign: 'center', flex: 1, color: '#fff' }}>
+            <div style={{ fontSize: 22, fontWeight: 700 }}>4</div>
+            <div style={{ fontSize: 12 }}>Triagens</div>
+          </div>
+          <div style={{ background: 'rgba(255,255,255,0.2)', borderRadius: 8, padding: '6px 14px', textAlign: 'center', flex: 1, color: '#fff' }}>
+            <div style={{ fontSize: 22, fontWeight: 700 }}>Normal</div>
+            <div style={{ fontSize: 12 }}>Último resultado</div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ padding: '0 16px', overflowY: 'auto', height: 'calc(100% - 228px)' }}>
+        <Btn label="+ Iniciar Nova Triagem" fill={INK} style={{ margin: '14px 0 10px' }}/>
+        <div style={{ fontSize: 16, fontWeight: 700, color: INK, marginBottom: 8 }}>Histórico recente</div>
+        {[
+          { date: '18 Abr', local: 'Rangel', risk: 'normal' },
+          { date: '02 Mar', local: 'Sambizanga', risk: 'atencao' },
+          { date: '15 Jan', local: 'Rangel', risk: 'normal' },
+        ].map((item, i) => (
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10,
+            padding: '10px 0', borderBottom: `1px solid ${GRAY_LIGHT}` }}>
+            <div style={{ width: 8, height: 8, borderRadius: 4,
+              background: item.risk === 'normal' ? GREEN : item.risk === 'atencao' ? YELLOW : RED }} />
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 15, fontWeight: 600 }}>{item.date} · {item.local}</div>
+              <div style={{ fontSize: 13, color: GRAY }}>
+                {item.risk === 'normal' ? 'Normal' : item.risk === 'atencao' ? 'Atenção' : 'Alto Risco'}
+              </div>
+            </div>
+            <span style={{ fontSize: 18, color: GRAY }}>›</span>
+          </div>
+        ))}
+      </div>
+      <BottomNav active={0}/>
+    </div>
+  );
+}
+
+// 2A – Nova Triagem: step wizard
+function Triagem_A() {
+  return (
+    <div style={{ width: 390, height: 780, background: '#fafafa', fontFamily: 'Caveat, cursive', position: 'relative', overflow: 'hidden' }}>
+      <StatusBar/>
+      <div style={{ padding: '14px 16px' }}>
+        {/* Progress */}
+        <div style={{ fontSize: 13, color: GRAY, marginBottom: 6 }}>Passo 1 de 3</div>
+        <div style={{ height: 6, background: GRAY_LIGHT, borderRadius: 3, marginBottom: 16 }}>
+          <div style={{ width: '33%', height: '100%', background: PINK_MID, borderRadius: 3 }}/>
+        </div>
+        <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>Dados da Paciente</div>
+        <div style={{ fontSize: 14, color: GRAY, marginBottom: 20 }}>Confirme os seus dados antes de iniciar</div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <Input label="Nome completo" value="Maria Fernandes"/>
+          <Input label="Idade" value="34 anos"/>
+          <Input label="Data de nascimento" value="12 / 04 / 1992"/>
+          <Input label="Centro de saúde" value="C.S. Rangel, Luanda"/>
+          <Input label="Agente de saúde" value="Enfermeira Ana Costa"/>
+        </div>
+
+        <div style={{ marginTop: 20, display: 'flex', gap: 10 }}>
+          <Btn label="Cancelar" fill="#fff" textColor={INK} w="40%" style={{ border: `2px solid ${GRAY_MID}` }}/>
+          <Btn label="Continuar →" fill={PINK_MID} w="58%"/>
+        </div>
+
+        <div style={{ marginTop: 14, padding: 12, background: PINK_LIGHT,
+          border: `1.5px dashed ${PINK}`, borderRadius: 8, fontSize: 13, color: GRAY, textAlign: 'center' }}>
+          ⚠️ Este sistema não faz diagnóstico médico. Apenas rastreio preventivo.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 2B – Nova Triagem: patient ID scan + quick confirm
+function Triagem_B() {
+  return (
+    <div style={{ width: 390, height: 780, background: '#fafafa', fontFamily: 'Caveat, cursive', position: 'relative', overflow: 'hidden' }}>
+      <StatusBar/>
+      <ScreenTitle label="Nova Triagem" sub="Identificar paciente"/>
+      <div style={{ padding: '0 16px' }}>
+        {/* QR scan area */}
+        <div style={{ border: `2.5px dashed ${PINK_MID}`, borderRadius: 12,
+          height: 200, display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          background: PINK_LIGHT, marginBottom: 14, gap: 8 }}>
+          <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+            <rect x="5" y="5" width="22" height="22" rx="2" stroke={PINK_MID} strokeWidth="3"/>
+            <rect x="11" y="11" width="10" height="10" fill={PINK_MID}/>
+            <rect x="33" y="5" width="22" height="22" rx="2" stroke={PINK_MID} strokeWidth="3"/>
+            <rect x="39" y="11" width="10" height="10" fill={PINK_MID}/>
+            <rect x="5" y="33" width="22" height="22" rx="2" stroke={PINK_MID} strokeWidth="3"/>
+            <rect x="11" y="39" width="10" height="10" fill={PINK_MID}/>
+            <line x1="33" y1="33" x2="55" y2="55" stroke={PINK_MID} strokeWidth="3"/>
+          </svg>
+          <div style={{ fontSize: 15, color: PINK_MID, fontWeight: 600 }}>Digitalizar cartão da paciente</div>
+          <div style={{ fontSize: 13, color: GRAY }}>ou introduzir número manualmente</div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+          <div style={{ flex: 1, height: 1, background: GRAY_LIGHT }}/>
+          <div style={{ fontSize: 14, color: GRAY }}>ou</div>
+          <div style={{ flex: 1, height: 1, background: GRAY_LIGHT }}/>
+        </div>
+
+        <Input label="Nº de registo" value="" style={{ marginBottom: 10 }}/>
+        <Input label="Nome da paciente" value="" style={{ marginBottom: 20 }}/>
+
+        <Btn label="Confirmar e Avançar" fill={PINK_MID}/>
+
+        <div style={{ marginTop: 12, textAlign: 'center', fontSize: 13, color: GRAY }}>
+          Paciente nova? <span style={{ color: PINK_MID, fontWeight: 600 }}>Cadastrar aqui</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 3A – Sensor data: live tiles
+function Sensor_A() {
+  return (
+    <div style={{ width: 390, height: 780, background: '#fafafa', fontFamily: 'Caveat, cursive', position: 'relative', overflow: 'hidden' }}>
+      <StatusBar/>
+      <div style={{ padding: '14px 16px 0' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+          <div style={{ fontSize: 22, fontWeight: 700 }}>Leitura em curso</div>
+          <Pill label="● Ao vivo" color={GREEN} style={{ fontSize: 12, animation: 'pulse 1s infinite' }}/>
+        </div>
+        <div style={{ fontSize: 14, color: GRAY, marginBottom: 16 }}>Aguarde enquanto os sensores recolhem dados…</div>
+
+        {/* Animated progress */}
+        <div style={{ height: 8, background: GRAY_LIGHT, borderRadius: 4, marginBottom: 20, overflow: 'hidden' }}>
+          <div style={{ width: '65%', height: '100%', background: PINK_MID, borderRadius: 4 }}/>
+        </div>
+
+        {/* 2×2 sensor grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
+          {[
+            { icon: '🌡️', label: 'Temp. Mama Esq.', value: '36.8°C', sub: 'normal' },
+            { icon: '🌡️', label: 'Temp. Mama Dir.', value: '37.4°C', sub: '+0.6°C' },
+            { icon: '❤️', label: 'Freq. Cardíaca', value: '78 bpm', sub: 'normal' },
+            { icon: '💧', label: 'SpO2', value: '97%', sub: 'normal' },
+          ].map((s, i) => (
+            <Card key={i} style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 24 }}>{s.icon}</div>
+              <div style={{ fontSize: 12, color: GRAY, marginBottom: 4 }}>{s.label}</div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: i === 1 ? YELLOW : INK }}>{s.value}</div>
+              <div style={{ fontSize: 12, color: i === 1 ? YELLOW : GRAY }}>{s.sub}</div>
+            </Card>
+          ))}
+        </div>
+
+        {/* Assimetria térmica */}
+        <Card style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}>Assimetria Térmica</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ flex: 1, height: 10, background: GRAY_LIGHT, borderRadius: 5, overflow: 'hidden' }}>
+              <div style={{ width: '40%', height: '100%', background: YELLOW, borderRadius: 5 }}/>
+            </div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: YELLOW }}>0.6°C</div>
+          </div>
+          <div style={{ fontSize: 13, color: GRAY, marginTop: 4 }}>Limite recomendado: &lt; 0.5°C</div>
+        </Card>
+
+        {/* Activity level */}
+        <Card>
+          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>Nível de Actividade</div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {['Em repouso','Baixo','Médio','Alto'].map((l, i) => (
+              <div key={i} style={{ flex: 1, textAlign: 'center', padding: '4px 0', fontSize: 11,
+                background: i === 0 ? PINK_MID : GRAY_LIGHT,
+                color: i === 0 ? '#fff' : GRAY, borderRadius: 4 }}>{l}</div>
+            ))}
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+// 3B – Sensor data: body diagram + readings sidebar
+function Sensor_B() {
+  return (
+    <div style={{ width: 390, height: 780, background: '#fafafa', fontFamily: 'Caveat, cursive', position: 'relative', overflow: 'hidden' }}>
+      <StatusBar/>
+      <ScreenTitle label="Sensores" sub="Recolha em tempo real"/>
+      <div style={{ padding: '0 16px' }}>
+        {/* Body diagram placeholder */}
+        <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
+          <div style={{ flex: 1, border: `2px dashed ${GRAY_MID}`, borderRadius: 10,
+            height: 200, display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center', background: PINK_LIGHT, gap: 4 }}>
+            {/* Simple torso silhouette */}
+            <svg width="80" height="130" viewBox="0 0 80 130" fill="none">
+              <ellipse cx="40" cy="18" rx="16" ry="16" stroke={GRAY} strokeWidth="2"/>
+              <rect x="18" y="38" width="44" height="54" rx="8" stroke={GRAY} strokeWidth="2"/>
+              <ellipse cx="28" cy="64" rx="10" ry="9" stroke={YELLOW} strokeWidth="2.5" strokeDasharray="4 2"/>
+              <ellipse cx="52" cy="64" rx="10" ry="9" stroke={GRAY_MID} strokeWidth="2"/>
+              <text x="24" y="68" fill={YELLOW} fontSize="10" textAnchor="middle" fontFamily="Caveat">⬆</text>
+            </svg>
+            <div style={{ fontSize: 12, color: GRAY }}>Zona em análise</div>
+          </div>
+
+          {/* Readings list */}
+          <div style={{ width: 160, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {[
+              { label: 'Mama Esq.', val: '36.8°C', ok: true },
+              { label: 'Mama Dir.', val: '37.4°C', ok: false },
+              { label: 'FC', val: '78 bpm', ok: true },
+              { label: 'SpO2', val: '97%', ok: true },
+              { label: 'Assimetria', val: '0.6°C', ok: false },
+            ].map((r, i) => (
+              <div key={i} style={{ background: '#fff', border: `1.5px solid ${r.ok ? GRAY_MID : YELLOW}`,
+                borderRadius: 6, padding: '6px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ fontSize: 12, color: GRAY }}>{r.label}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: r.ok ? INK : YELLOW }}>{r.val}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ height: 6, background: GRAY_LIGHT, borderRadius: 3, marginBottom: 8, overflow: 'hidden' }}>
+          <div style={{ width: '75%', height: '100%', background: PINK_MID, borderRadius: 3 }}/>
+        </div>
+        <div style={{ fontSize: 13, color: GRAY, textAlign: 'center', marginBottom: 14 }}>
+          A recolher dados… 75% concluído
+        </div>
+
+        <Btn label="Cancelar Leitura" fill="#fff" textColor={INK} style={{ border: `2px solid ${GRAY_MID}` }}/>
+      </div>
+    </div>
+  );
+}
+
+// 4A – Result: large gauge center
+function Result_A() {
+  return (
+    <div style={{ width: 390, height: 780, background: '#fafafa', fontFamily: 'Caveat, cursive', position: 'relative', overflow: 'hidden' }}>
+      <StatusBar/>
+      <div style={{ padding: '20px 16px', textAlign: 'center' }}>
+        <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>Resultado da Triagem</div>
+        <div style={{ fontSize: 14, color: GRAY, marginBottom: 24 }}>18 Abril 2026 · 14:32</div>
+
+        {/* Gauge */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6 }}>
+          <RiskGauge level="normal" size={200}/>
+        </div>
+
+        <div style={{ fontSize: 14, color: GRAY, marginBottom: 20 }}>
+          Os seus valores estão dentro do esperado. Continue a monitorizar regularmente.
+        </div>
+
+        {/* Summary table */}
+        <Card style={{ textAlign: 'left', marginBottom: 12 }}>
+          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 8 }}>Resumo dos dados</div>
+          {[
+            ['Temp. Mama Esq.', '36.5°C', true],
+            ['Temp. Mama Dir.', '36.7°C', true],
+            ['Assimetria Térmica', '0.2°C', true],
+            ['Freq. Cardíaca', '76 bpm', true],
+            ['SpO2', '98%', true],
+          ].map(([label, val, ok], i) => (
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between',
+              padding: '5px 0', borderBottom: i < 4 ? `1px solid ${GRAY_LIGHT}` : 'none' }}>
+              <div style={{ fontSize: 14, color: GRAY }}>{label}</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: ok ? GREEN : RED }}>{val}</div>
+            </div>
+          ))}
+        </Card>
+
+        <div style={{ display: 'flex', gap: 10 }}>
+          <Btn label="📤 Partilhar" fill="#fff" textColor={INK} w="48%" style={{ border: `2px solid ${GRAY_MID}` }}/>
+          <Btn label="✅ Concluir" fill={PINK_MID} w="50%"/>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 4B – Result: ALTO RISCO variant
+function Result_B() {
+  return (
+    <div style={{ width: 390, height: 780, background: '#fff5f5', fontFamily: 'Caveat, cursive', position: 'relative', overflow: 'hidden' }}>
+      <div style={{ background: RED, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', color: '#fff', fontSize: 13 }}>
+        <span>9:41</span><span>BIOMA</span><span>📶 🔋</span>
+      </div>
+
+      {/* Alert banner */}
+      <div style={{ background: RED, padding: '16px', textAlign: 'center', color: '#fff' }}>
+        <div style={{ fontSize: 28, marginBottom: 4 }}>⚠️</div>
+        <div style={{ fontSize: 24, fontWeight: 700 }}>Alto Risco Detectado</div>
+        <div style={{ fontSize: 14, opacity: 0.9 }}>Por favor, consulte um médico brevemente</div>
+      </div>
+
+      <div style={{ padding: '14px 16px', overflowY: 'auto', height: 'calc(100% - 160px)' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
+          <RiskGauge level="alto" size={180}/>
+        </div>
+
+        {/* Values */}
+        <Card style={{ marginBottom: 12 }}>
+          {[
+            ['Temp. Mama Esq.', '36.4°C', true],
+            ['Temp. Mama Dir.', '38.1°C', false],
+            ['Assimetria Térmica', '1.7°C ⚠️', false],
+            ['Freq. Cardíaca', '88 bpm', true],
+            ['SpO2', '96%', true],
+          ].map(([label, val, ok], i) => (
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between',
+              padding: '5px 0', borderBottom: i < 4 ? `1px solid ${GRAY_LIGHT}` : 'none' }}>
+              <div style={{ fontSize: 14, color: GRAY }}>{label}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: ok ? INK : RED }}>{val}</div>
+            </div>
+          ))}
+        </Card>
+
+        {/* Recommendation */}
+        <Card style={{ background: '#fff8f8', border: `2px solid ${RED}`, marginBottom: 12 }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: RED, marginBottom: 6 }}>📍 Recomendação</div>
+          <div style={{ fontSize: 14, color: INK, lineHeight: 1.5 }}>
+            Dirija-se ao <strong>Hospital do Prenda</strong> o mais breve possível. Mostre este relatório ao médico.
+          </div>
+          <Btn label="Ver no mapa →" fill={RED} style={{ marginTop: 10 }}/>
+        </Card>
+
+        <Btn label="📤 Partilhar com familiar" fill="#fff" textColor={INK} style={{ border: `2px solid ${GRAY_MID}` }}/>
+      </div>
+    </div>
+  );
+}
+
+// 5A – Histórico: list view
+function Historico_A() {
+  return (
+    <div style={{ width: 390, height: 780, background: '#fafafa', fontFamily: 'Caveat, cursive', position: 'relative', overflow: 'hidden' }}>
+      <StatusBar/>
+      <ScreenTitle label="Histórico" sub="Todas as triagens"/>
+      <div style={{ padding: '0 16px', overflowY: 'auto', height: 'calc(100% - 130px)' }}>
+        {/* Filter row */}
+        <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+          {['Todos','Normal','Atenção','Alto Risco'].map((f, i) => (
+            <div key={i} style={{ padding: '4px 10px', borderRadius: 20,
+              border: `1.5px solid ${i === 0 ? PINK_MID : GRAY_MID}`,
+              background: i === 0 ? PINK_LIGHT : '#fff',
+              color: i === 0 ? PINK_MID : GRAY,
+              fontSize: 13, cursor: 'pointer' }}>{f}</div>
+          ))}
+        </div>
+
+        {[
+          { date: '18 Abr 2026', local: 'C.S. Rangel', risk: 'normal', hr: '76 bpm', temp: '36.6°C' },
+          { date: '02 Mar 2026', local: 'C.S. Sambizanga', risk: 'atencao', hr: '82 bpm', temp: '37.2°C' },
+          { date: '10 Jan 2026', local: 'C.S. Rangel', risk: 'normal', hr: '74 bpm', temp: '36.4°C' },
+          { date: '05 Nov 2025', local: 'C.S. Rangel', risk: 'normal', hr: '80 bpm', temp: '36.5°C' },
+        ].map((item, i) => (
+          <Card key={i} style={{ marginBottom: 10 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <div style={{ fontSize: 16, fontWeight: 700 }}>{item.date}</div>
+                <div style={{ fontSize: 13, color: GRAY }}>{item.local}</div>
+                <div style={{ fontSize: 13, color: GRAY, marginTop: 4 }}>❤️ {item.hr} · 🌡️ {item.temp}</div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <Pill
+                  label={item.risk === 'normal' ? 'Normal' : item.risk === 'atencao' ? 'Atenção' : 'Alto Risco'}
+                  color={item.risk === 'normal' ? GREEN : item.risk === 'atencao' ? YELLOW : RED}
+                />
+                <div style={{ fontSize: 22, color: GRAY, marginTop: 6, textAlign: 'right' }}>›</div>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+      <BottomNav active={2}/>
+    </div>
+  );
+}
+
+// 5B – Histórico: chart/graph view
+function Historico_B() {
+  return (
+    <div style={{ width: 390, height: 780, background: '#fafafa', fontFamily: 'Caveat, cursive', position: 'relative', overflow: 'hidden' }}>
+      <StatusBar/>
+      <ScreenTitle label="Evolução" sub="Tendência ao longo do tempo"/>
+      <div style={{ padding: '0 16px', overflowY: 'auto', height: 'calc(100% - 130px)' }}>
+        {/* Mini chart placeholder */}
+        <div style={{ border: `2px dashed ${GRAY_MID}`, borderRadius: 10, height: 160,
+          background: '#fff', marginBottom: 14, padding: 12, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: INK }}>Assimetria Térmica (°C)</div>
+          <svg width="100%" height="100" viewBox="0 0 340 100" preserveAspectRatio="none">
+            <line x1="0" y1="80" x2="340" y2="80" stroke={GRAY_LIGHT} strokeWidth="1"/>
+            <line x1="0" y1="50" x2="340" y2="50" stroke={GRAY_LIGHT} strokeWidth="1" strokeDasharray="4"/>
+            <polyline points="20,70 90,60 160,75 230,40 300,68" fill="none" stroke={PINK_MID} strokeWidth="2.5" strokeLinejoin="round"/>
+            {[20,90,160,230,300].map((x,i) => <circle key={i} cx={x} cy={[70,60,75,40,68][i]} r="4" fill={PINK_MID}/>)}
+            <text x="20" y="95" fontSize="10" fill={GRAY} textAnchor="middle">Nov</text>
+            <text x="90" y="95" fontSize="10" fill={GRAY} textAnchor="middle">Dez</text>
+            <text x="160" y="95" fontSize="10" fill={GRAY} textAnchor="middle">Jan</text>
+            <text x="230" y="95" fontSize="10" fill={GRAY} textAnchor="middle">Mar</text>
+            <text x="300" y="95" fontSize="10" fill={GRAY} textAnchor="middle">Abr</text>
+            {/* threshold line */}
+            <line x1="0" y1="50" x2="340" y2="50" stroke={YELLOW} strokeWidth="1.5" strokeDasharray="6 3"/>
+            <text x="320" y="46" fontSize="9" fill={YELLOW}>limite</text>
+          </svg>
+        </div>
+
+        {/* Risk timeline dots */}
+        <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 10 }}>Linha de tempo</div>
+        <div style={{ position: 'relative', paddingLeft: 28 }}>
+          <div style={{ position: 'absolute', left: 9, top: 8, bottom: 8, width: 2, background: GRAY_LIGHT }}/>
+          {[
+            { date: '18 Abr', risk: 'normal', label: 'Normal' },
+            { date: '02 Mar', risk: 'atencao', label: 'Atenção – consulta recomendada' },
+            { date: '10 Jan', risk: 'normal', label: 'Normal' },
+            { date: '05 Nov', risk: 'normal', label: 'Normal' },
+          ].map((item, i) => (
+            <div key={i} style={{ position: 'relative', marginBottom: 16 }}>
+              <div style={{ position: 'absolute', left: -22, top: 4, width: 14, height: 14, borderRadius: 7,
+                background: item.risk === 'normal' ? GREEN : item.risk === 'atencao' ? YELLOW : RED,
+                border: '2px solid #fff', boxShadow: '0 0 0 1.5px ' + (item.risk === 'normal' ? GREEN : YELLOW) }}/>
+              <div style={{ fontSize: 13, fontWeight: 700 }}>{item.date}</div>
+              <div style={{ fontSize: 13, color: GRAY }}>{item.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <BottomNav active={2}/>
+    </div>
+  );
+}
+
+// 6A – Alerta: modal overlay
+function Alerta_A() {
+  return (
+    <div style={{ width: 390, height: 780, background: 'rgba(0,0,0,0.4)', fontFamily: 'Caveat, cursive', position: 'relative', overflow: 'hidden' }}>
+      {/* Blurred background */}
+      <div style={{ position: 'absolute', inset: 0, background: '#fafafa', filter: 'blur(2px)', zIndex: 0 }}/>
+      {/* Modal */}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 2,
+        background: '#fff', borderRadius: '20px 20px 0 0', padding: '24px 20px',
+        boxShadow: '0 -8px 40px rgba(0,0,0,0.2)' }}>
+        {/* Handle */}
+        <div style={{ width: 40, height: 4, background: GRAY_LIGHT, borderRadius: 2, margin: '0 auto 20px' }}/>
+
+        <div style={{ textAlign: 'center', marginBottom: 20 }}>
+          <div style={{ fontSize: 48, marginBottom: 8 }}>⚠️</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: YELLOW }}>Atenção</div>
+          <div style={{ fontSize: 15, color: GRAY, marginTop: 6 }}>
+            Detectámos uma assimetria térmica ligeiramente elevada.
+          </div>
+        </div>
+
+        <Card style={{ background: '#fffbea', border: `1.5px solid ${YELLOW}`, marginBottom: 14 }}>
+          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 6 }}>📋 O que deve fazer</div>
+          <div style={{ fontSize: 14, lineHeight: 1.6, color: INK }}>
+            1. Não entre em pânico — isto é apenas um aviso preventivo.<br/>
+            2. Marque uma consulta no prazo de 2 semanas.<br/>
+            3. Evite actividade física intensa nas próximas 48h.
+          </div>
+        </Card>
+
+        <Card style={{ background: PINK_LIGHT, border: `1.5px solid ${PINK}`, marginBottom: 16 }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: PINK_MID, marginBottom: 4 }}>🏥 Hospital mais próximo</div>
+          <div style={{ fontSize: 14, color: INK }}>Hospital Américo Boavida</div>
+          <div style={{ fontSize: 13, color: GRAY }}>Av. Hoji ya Henda · 3.2 km</div>
+          <Btn label="Ver rota" fill={PINK_MID} style={{ marginTop: 8 }}/>
+        </Card>
+
+        <div style={{ display: 'flex', gap: 10 }}>
+          <Btn label="📤 Partilhar" fill="#fff" textColor={INK} w="48%" style={{ border: `2px solid ${GRAY_MID}` }}/>
+          <Btn label="OK, Entendi" fill={YELLOW} textColor={INK} w="50%"/>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 6B – Alerta: full screen alto risco
+function Alerta_B() {
+  return (
+    <div style={{ width: 390, height: 780, background: '#fff5f5', fontFamily: 'Caveat, cursive', position: 'relative', overflow: 'hidden' }}>
+      <div style={{ background: RED, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', color: '#fff', fontSize: 13 }}>
+        <span>9:41</span><span>BIOMA</span><span>📶 🔋</span>
+      </div>
+
+      {/* Pulsing alert top */}
+      <div style={{ background: RED, padding: '28px 20px', textAlign: 'center', color: '#fff' }}>
+        <div style={{ fontSize: 56, marginBottom: 8 }}>🔴</div>
+        <div style={{ fontSize: 26, fontWeight: 700 }}>Alto Risco</div>
+        <div style={{ fontSize: 15, opacity: 0.9, marginTop: 4 }}>Consulta urgente recomendada</div>
+      </div>
+
+      <div style={{ padding: '16px', overflowY: 'auto', height: 'calc(100% - 220px)' }}>
+        {/* Explanation card */}
+        <Card style={{ background: '#fff8f8', border: `2px solid ${RED}`, marginBottom: 14 }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: RED, marginBottom: 8 }}>O que isto significa</div>
+          <div style={{ fontSize: 14, color: INK, lineHeight: 1.6 }}>
+            O BIOMA detectou uma diferença de temperatura significativa entre as duas mamas (1.7°C). Isto pode indicar inflamação ou alteração que requer avaliação médica.
+          </div>
+          <Divider/>
+          <div style={{ fontSize: 13, color: GRAY, fontStyle: 'italic' }}>
+            ⚕️ Este resultado não é um diagnóstico. Apenas um médico pode confirmar.
+          </div>
+        </Card>
+
+        {/* Hospital card */}
+        <Card style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 8 }}>🏥 Onde ir agora</div>
+          {[
+            { name: 'Hospital do Prenda', dist: '1.8 km', tel: '222 323 000' },
+            { name: 'Hospital Américo Boavida', dist: '3.2 km', tel: '222 370 491' },
+          ].map((h, i) => (
+            <div key={i} style={{ padding: '8px 0', borderBottom: i < 1 ? `1px solid ${GRAY_LIGHT}` : 'none' }}>
+              <div style={{ fontSize: 15, fontWeight: 600 }}>{h.name}</div>
+              <div style={{ fontSize: 13, color: GRAY }}>📍 {h.dist} · 📞 {h.tel}</div>
+            </div>
+          ))}
+          <Btn label="Abrir no mapa" fill={RED} style={{ marginTop: 10 }}/>
+        </Card>
+
+        <div style={{ display: 'flex', gap: 10 }}>
+          <Btn label="📱 Partilhar" fill="#fff" textColor={INK} w="48%" style={{ border: `2px solid ${GRAY_MID}` }}/>
+          <Btn label="Guardar alerta" fill={RED} w="50%"/>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 7A – Admin: patient list
+function Admin_A() {
+  return (
+    <div style={{ width: 390, height: 780, background: '#f5f5f5', fontFamily: 'Caveat, cursive', position: 'relative', overflow: 'hidden' }}>
+      <div style={{ background: '#2a2a2a', height: 36, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', color: '#fff', fontSize: 13 }}>
+        <span>9:41</span><span>BIOMA Admin</span><span>📶 🔋</span>
+      </div>
+      <div style={{ background: '#2a2a2a', padding: '14px 16px 16px' }}>
+        <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', marginBottom: 2 }}>Painel de Administração</div>
+        <div style={{ fontSize: 22, fontWeight: 700, color: '#fff' }}>C.S. Rangel, Luanda</div>
+        <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
+          {[['12','Pacientes'],['3','Hoje'],['1','Alto Risco']].map(([n, l]) => (
+            <div key={l} style={{ flex: 1, background: 'rgba(255,255,255,0.1)', borderRadius: 8, padding: '8px', textAlign: 'center', color: '#fff' }}>
+              <div style={{ fontSize: 20, fontWeight: 700 }}>{n}</div>
+              <div style={{ fontSize: 12 }}>{l}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ padding: '0 16px', overflowY: 'auto', height: 'calc(100% - 196px)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0 8px' }}>
+          <div style={{ fontSize: 16, fontWeight: 700 }}>Pacientes recentes</div>
+          <Btn label="+ Adicionar" fill={PINK_MID} style={{ width: 100, padding: '4px 0', fontSize: 13 }}/>
+        </div>
+
+        {/* Search */}
+        <div style={{ border: `1.5px solid ${GRAY_MID}`, borderRadius: 8, padding: '8px 12px',
+          background: '#fff', color: GRAY, fontSize: 14, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span>🔍</span><span>Pesquisar paciente…</span>
+        </div>
+
+        {[
+          { name: 'Maria Fernandes', age: 34, risk: 'normal', date: 'Hoje' },
+          { name: 'Ana Lopes', age: 45, risk: 'alto', date: 'Hoje' },
+          { name: 'Fernanda Rocha', age: 29, risk: 'atencao', date: 'Ontem' },
+          { name: 'Joana Mendes', age: 52, risk: 'normal', date: '15 Abr' },
+        ].map((p, i) => (
+          <Card key={i} style={{ marginBottom: 8 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                <div style={{ width: 36, height: 36, borderRadius: 18, background: PINK_LIGHT,
+                  border: `1.5px solid ${PINK}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>
+                  {p.name[0]}
+                </div>
+                <div>
+                  <div style={{ fontSize: 15, fontWeight: 600 }}>{p.name}</div>
+                  <div style={{ fontSize: 13, color: GRAY }}>{p.age} anos · {p.date}</div>
+                </div>
+              </div>
+              <Pill
+                label={p.risk === 'normal' ? 'Normal' : p.risk === 'atencao' ? 'Atenção' : 'Alto Risco'}
+                color={p.risk === 'normal' ? GREEN : p.risk === 'atencao' ? YELLOW : RED}
+                style={{ fontSize: 12 }}
+              />
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// 7B – Admin: dashboard with stats + quick actions
+function Admin_B() {
+  return (
+    <div style={{ width: 390, height: 780, background: '#fafafa', fontFamily: 'Caveat, cursive', position: 'relative', overflow: 'hidden' }}>
+      <div style={{ background: '#2a2a2a', height: 36, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', color: '#fff', fontSize: 13 }}>
+        <span>9:41</span><span>Admin</span><span>📶 🔋</span>
+      </div>
+
+      <div style={{ padding: '14px 16px 0', overflowY: 'auto', height: 'calc(100% - 36px)' }}>
+        <div style={{ fontSize: 14, color: GRAY }}>Olá, Enfermeira Ana</div>
+        <div style={{ fontSize: 24, fontWeight: 700, color: INK, marginBottom: 14 }}>Painel de Controlo</div>
+
+        {/* Quick actions */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+          {[
+            { icon: '👤', label: 'Nova Paciente', color: PINK_LIGHT, border: PINK },
+            { icon: '🔬', label: 'Nova Triagem', color: '#f0fff4', border: GREEN },
+            { icon: '📋', label: 'Ver Histórico', color: '#fffbea', border: YELLOW },
+            { icon: '⚠️', label: 'Ver Alertas', color: '#fff5f5', border: RED },
+          ].map((a, i) => (
+            <Card key={i} style={{ background: a.color, border: `1.5px solid ${a.border}`, textAlign: 'center', padding: '14px 10px' }}>
+              <div style={{ fontSize: 26, marginBottom: 4 }}>{a.icon}</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: INK }}>{a.label}</div>
+            </Card>
+          ))}
+        </div>
+
+        {/* Risk distribution */}
+        <Card style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 10 }}>Distribuição de Risco (Hoje)</div>
+          <div style={{ display: 'flex', height: 16, borderRadius: 8, overflow: 'hidden', marginBottom: 8 }}>
+            <div style={{ flex: 7, background: GREEN }}/>
+            <div style={{ flex: 2, background: YELLOW }}/>
+            <div style={{ flex: 1, background: RED }}/>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+            <span style={{ color: GREEN }}>● Normal (70%)</span>
+            <span style={{ color: YELLOW }}>● Atenção (20%)</span>
+            <span style={{ color: RED }}>● Alto (10%)</span>
+          </div>
+        </Card>
+
+        {/* Alerts */}
+        <Card style={{ background: '#fff8f8', border: `1.5px solid ${RED}`, marginBottom: 14 }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: RED, marginBottom: 8 }}>⚠️ Alertas Activos</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 600 }}>Ana Lopes · Alto Risco</div>
+              <div style={{ fontSize: 13, color: GRAY }}>Hoje às 10:15 · Aguarda encaminhamento</div>
+            </div>
+            <Btn label="Ver" fill={RED} style={{ width: 56, padding: '4px 0', fontSize: 13 }}/>
+          </div>
+        </Card>
+
+        {/* Sensor status */}
+        <Card>
+          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 8 }}>🤖 Estado dos Sensores</div>
+          {[['Sensor A','Online',true],['Sensor B','Calibrando…',false]].map(([n,s,ok],i) => (
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0',
+              borderBottom: i < 1 ? `1px solid ${GRAY_LIGHT}` : 'none' }}>
+              <div style={{ fontSize: 14 }}>{n}</div>
+              <Pill label={s} color={ok ? GREEN : YELLOW} style={{ fontSize: 12 }}/>
+            </div>
+          ))}
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main App ──────────────────────────────────────────────
+
+function App() {
+  return (
+    <DesignCanvas>
+      <DCSection id="dashboard" title="1 · Dashboard / Início" subtitle="Visão geral da paciente ao abrir a app">
+        <DCArtboard id="a" label="A · Cartões de resumo" width={390} height={780}><Dashboard_A/></DCArtboard>
+        <DCArtboard id="b" label="B · Cabeçalho colorido + lista" width={390} height={780}><Dashboard_B/></DCArtboard>
+      </DCSection>
+
+      <DCSection id="triagem" title="2 · Nova Triagem" subtitle="Iniciar sessão de rastreio">
+        <DCArtboard id="a" label="A · Wizard passo a passo" width={390} height={780}><Triagem_A/></DCArtboard>
+        <DCArtboard id="b" label="B · Digitalizar cartão + manual" width={390} height={780}><Triagem_B/></DCArtboard>
+      </DCSection>
+
+      <DCSection id="sensor" title="3 · Dados dos Sensores" subtitle="Leitura em tempo real">
+        <DCArtboard id="a" label="A · Grelha de tiles" width={390} height={780}><Sensor_A/></DCArtboard>
+        <DCArtboard id="b" label="B · Diagrama corporal + lista" width={390} height={780}><Sensor_B/></DCArtboard>
+      </DCSection>
+
+      <DCSection id="resultado" title="4 · Resultado de Risco" subtitle="Resultado final da triagem">
+        <DCArtboard id="a" label="A · Normal (gauge central)" width={390} height={780}><Result_A/></DCArtboard>
+        <DCArtboard id="b" label="B · Alto Risco (alerta visual)" width={390} height={780}><Result_B/></DCArtboard>
+      </DCSection>
+
+      <DCSection id="historico" title="5 · Histórico de Triagens" subtitle="Consultar triagens anteriores">
+        <DCArtboard id="a" label="A · Lista com filtros" width={390} height={780}><Historico_A/></DCArtboard>
+        <DCArtboard id="b" label="B · Gráfico + linha do tempo" width={390} height={780}><Historico_B/></DCArtboard>
+      </DCSection>
+
+      <DCSection id="alerta" title="6 · Alerta + Recomendação" subtitle="Modal de atenção ou alto risco">
+        <DCArtboard id="a" label="A · Modal bottom sheet (Atenção)" width={390} height={780}><Alerta_A/></DCArtboard>
+        <DCArtboard id="b" label="B · Ecrã completo (Alto Risco)" width={390} height={780}><Alerta_B/></DCArtboard>
+      </DCSection>
+
+      <DCSection id="admin" title="7 · Painel Admin" subtitle="Gestão de pacientes e triagens">
+        <DCArtboard id="a" label="A · Lista de pacientes" width={390} height={780}><Admin_A/></DCArtboard>
+        <DCArtboard id="b" label="B · Dashboard de estatísticas" width={390} height={780}><Admin_B/></DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App/>);
+</script>
+<div id="root"></div>
+</body>
+</html>
